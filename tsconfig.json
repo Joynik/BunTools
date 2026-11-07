@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "Preserve", "moduleResolution": "Bundler",
+    "strict": true, "noEmit": true, "esModuleInterop": true,
+    "types": ["bun", "vscode"], "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"]
+}
