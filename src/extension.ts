@@ -10,6 +10,8 @@ import {
   djangoHtml,
 } from "./formatter/core";
 import { FormattingProvider } from "./formatter/provider";
+import { BunLanguageStatus } from "./status";
+import { BunConfiguration } from "./configuration/bunfig";
 import { Linter } from "./linter/core";
 import { LintService, lintSelector, fixAllKind } from "./linter/service";
 
@@ -17,7 +19,12 @@ export function activate(context: vscode.ExtensionContext) {
   const output = vscode.window.createOutputChannel("Bun Tools");
   const runner = new Runner(2);
   const discovery = new Discovery(runner);
-  const formatter = new Formatter(runner);
+  const configuration = new BunConfiguration(runner, (file) =>
+    vscode.workspace
+      .getConfiguration("bunTools", vscode.Uri.file(file))
+      .get<string>("globalConfigPath", "~/.config/bun/bunfig.toml"),
+  );
+  const formatter = new Formatter(runner, configuration);
   const notified = new Set<string>();
   const log = (
     message: string,
@@ -41,16 +48,25 @@ export function activate(context: vscode.ExtensionContext) {
         });
     }
   };
-  const linter = new Linter(runner);
+  const linter = new Linter(runner, configuration);
   const lintService = new LintService(discovery, linter, reportError);
   const provider = new FormattingProvider(discovery, formatter, reportError);
   const selector: vscode.DocumentSelector = Object.keys(languages).flatMap(
     (language) => [
       { language, scheme: "file" },
       { language, scheme: "untitled" },
+      ...(language === "jsonc" || language === "json"
+        ? [{ language, scheme: "vscode-userdata" }]
+        : []),
     ],
   );
+  const languageStatus = new BunLanguageStatus(
+    discovery,
+    selector,
+    context.extension.id,
+  );
   context.subscriptions.push(
+    languageStatus,
     output,
     runner,
     provider,
@@ -88,12 +104,42 @@ export function activate(context: vscode.ExtensionContext) {
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => restart()),
   );
+  let globalWatchers: vscode.Disposable[] = [];
+  function watchGlobalConfiguration() {
+    for (const watcher of globalWatchers) watcher.dispose();
+    globalWatchers = [];
+    const folders = vscode.workspace.workspaceFolders?.map(
+      (folder) => folder.uri.fsPath,
+    ) ?? [process.cwd()];
+    const paths = new Set(
+      folders.map((folder) => configuration.globalFile(folder)).filter(Boolean),
+    );
+    for (const file of paths) {
+      const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(path.dirname(file), path.basename(file)),
+      );
+      globalWatchers.push(
+        watcher,
+        watcher.onDidChange(() => lintService.refresh()),
+        watcher.onDidCreate(() => lintService.refresh()),
+        watcher.onDidDelete(() => lintService.refresh()),
+      );
+    }
+  }
+  watchGlobalConfiguration();
+  context.subscriptions.push(
+    new vscode.Disposable(() => {
+      for (const watcher of globalWatchers) watcher.dispose();
+    }),
+  );
   function restart() {
     provider.dispose();
     runner.cancelAll();
     discovery.clear();
     lintService.refresh();
+    watchGlobalConfiguration();
     notified.clear();
+    void languageStatus.refresh();
     log("Runtime cache cleared. Bun will be discovered on the next request.");
   }
   async function chooseFolder(): Promise<vscode.WorkspaceFolder | undefined> {
@@ -177,10 +223,17 @@ export function activate(context: vscode.ExtensionContext) {
           const signal = controller.signal;
           let processed = 0;
           try {
+            const config = await configuration.resolve(
+              runtime,
+              "fmt",
+              cwd,
+              undefined,
+              signal,
+            );
             const list = await runner.run(
               runtime.path,
-              ["fmt", "--no-script", "--list-files", "."],
-              { cwd, signal, timeout: 120000 },
+              [...config.prefix, "fmt", "--no-script", "--list-files", "."],
+              { cwd: config.cwd, signal, timeout: 120000 },
             );
             if (list.code !== 0)
               throw new Error(
@@ -209,14 +262,26 @@ export function activate(context: vscode.ExtensionContext) {
             }
             const uniqueFiles = [...new Set(files)];
             let different = false;
-            for (let index = 0; index < uniqueFiles.length; index += 30) {
+            const batches = await configuration.groups(
+              runtime,
+              "fmt",
+              cwd,
+              uniqueFiles,
+              signal,
+            );
+            for (const { config: batchConfig, files: batch } of batches) {
               signal.throwIfAborted();
               if (!check && dirtyIn(folder))
                 throw new Error(
                   "An editor has unsaved changes. Workspace formatting stopped; earlier batches may have completed.",
                 );
-              const batch = uniqueFiles.slice(index, index + 30);
-              await formatter.ensureNative(runtime, cwd, batch, signal);
+              await formatter.ensureNative(
+                runtime,
+                cwd,
+                batch,
+                signal,
+                batchConfig,
+              );
               // The doctor may take time. Recheck dirty editors immediately before writing.
               if (!check && dirtyIn(folder))
                 throw new Error(
@@ -224,8 +289,14 @@ export function activate(context: vscode.ExtensionContext) {
                 );
               const result = await runner.run(
                 runtime.path,
-                ["fmt", "--no-script", ...(check ? ["--check"] : []), ...batch],
-                { cwd, signal, timeout: 120000 },
+                [
+                  ...batchConfig.prefix,
+                  "fmt",
+                  "--no-script",
+                  ...(check ? ["--check"] : []),
+                  ...batch,
+                ],
+                { cwd: batchConfig.cwd, signal, timeout: 120000 },
               );
               if (result.code > (check ? 1 : 0) || result.code < 0)
                 throw new Error(
@@ -366,11 +437,22 @@ export function activate(context: vscode.ExtensionContext) {
   command("restart", restart);
   command("showOutput", () => output.show());
   command("showRuntimeInfo", async () => {
-    const folder = vscode.workspace.workspaceFolders?.length
-      ? await chooseFolder()
-      : undefined;
-    if (vscode.workspace.workspaceFolders?.length && !folder) return;
-    const runtime = await runtimeFor(folder?.uri);
+    const active = vscode.window.activeTextEditor?.document;
+    const folder = active
+      ? vscode.workspace.getWorkspaceFolder(active.uri)
+      : vscode.workspace.workspaceFolders?.length
+        ? await chooseFolder()
+        : undefined;
+    if (!active && vscode.workspace.workspaceFolders?.length && !folder) return;
+    const resource = active?.uri ?? folder?.uri;
+    const runtime = await runtimeFor(resource);
+    const sourceFile =
+      active && ["file", "vscode-userdata"].includes(active.uri.scheme)
+        ? active.uri.fsPath
+        : undefined;
+    const cwd =
+      folder?.uri.fsPath ??
+      (sourceFile ? path.dirname(sourceFile) : process.cwd());
     const info = {
       executable: runtime.path,
       version: runtime.version,
@@ -387,8 +469,10 @@ export function activate(context: vscode.ExtensionContext) {
       fixes: runtime.fixes,
       typeAware: runtime.typeAware,
       lintReason: runtime.lintReason,
-      configuration:
-        "Bun resolves bunfig.toml, .editorconfig and supported formatter configs from the project cwd and source path.",
+      configuration: {
+        format: await configuration.resolve(runtime, "fmt", cwd, sourceFile),
+        lint: await configuration.resolve(runtime, "lint", cwd, sourceFile),
+      },
     };
     log(JSON.stringify(info, null, 2));
     output.show();
@@ -396,7 +480,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
   log("Ready. Select Bun Formatter & Linter using Format Document With…");
   // Public testable API; no additional executable commands or engine.
-  return { runtimeFor };
+  return { runtimeFor, languageStatus: languageStatus.item };
 }
 
 export function deactivate() {

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { BunConfiguration, type ConfigSource } from "../configuration/bunfig";
 import { Runner } from "../bun/runner";
 import type { Runtime } from "../bun/discovery";
 
@@ -76,18 +77,38 @@ export function minimalEdit(
 }
 
 export class Formatter {
-  constructor(private readonly runner: Runner) {}
+  constructor(
+    private readonly runner: Runner,
+    readonly configuration = new BunConfiguration(runner),
+  ) {}
 
   async ensureNative(
     runtime: Runtime,
     cwd: string,
     files: string[],
     signal?: AbortSignal,
+    selection?: ConfigSource,
   ): Promise<void> {
+    const config =
+      selection ??
+      (await this.configuration.resolve(
+        runtime,
+        "fmt",
+        cwd,
+        files.length === 1 ? files[0] : undefined,
+        signal,
+      ));
     const result = await this.runner.run(
       runtime.path,
-      ["fmt", "--no-script", "--doctor", "--format=json", ...files],
-      { cwd, signal },
+      [
+        ...config.prefix,
+        "fmt",
+        "--no-script",
+        "--doctor",
+        "--format=json",
+        ...files,
+      ],
+      { cwd: config.cwd, signal },
     );
     if (result.code !== 0)
       throw new Error(
@@ -125,20 +146,35 @@ export class Formatter {
     input: string,
     signal?: AbortSignal,
     range?: { start: number; end: number },
+    parser?: "jsonc",
   ): Promise<string> {
     if (!runtime.format)
       throw new Error(
         `Bun ${runtime.version} does not provide the required native formatter flags. Install Bun 1.4.4 or newer.`,
       );
-    await this.ensureNative(runtime, cwd, [file], signal);
-    const args = ["fmt", "--no-script", "--stdin-filepath", file];
+    const config = await this.configuration.resolve(
+      runtime,
+      "fmt",
+      cwd,
+      file,
+      signal,
+    );
+    await this.ensureNative(runtime, cwd, [file], signal, config);
+    const args = [
+      ...config.prefix,
+      "fmt",
+      "--no-script",
+      "--stdin-filepath",
+      file,
+    ];
+    if (parser) args.push(`--parser=${parser}`);
     if (range) {
       if (!runtime.range)
         throw new Error("This Bun does not support selection formatting.");
       args.push(`--range-start=${range.start}`, `--range-end=${range.end}`);
     }
     const result = await this.runner.run(runtime.path, args, {
-      cwd,
+      cwd: config.cwd,
       input,
       signal,
     });

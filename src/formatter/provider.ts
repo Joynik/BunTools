@@ -57,20 +57,20 @@ export class FormattingProvider
     try {
       const folder = vscode.workspace.getWorkspaceFolder(document.uri)?.uri
         .fsPath;
+      const hasSourcePath =
+        document.uri.scheme === "file" ||
+        document.uri.scheme === "vscode-userdata";
       const cwd =
         folder ??
-        (document.uri.scheme === "file"
-          ? path.dirname(document.uri.fsPath)
-          : os.homedir());
+        (hasSourcePath ? path.dirname(document.uri.fsPath) : os.homedir());
       const runtime = await this.discovery.get({
         folder,
         explicit: config.get<string>("bunPath"),
       });
       controller.signal.throwIfAborted();
-      const file =
-        document.uri.scheme === "file"
-          ? document.uri.fsPath
-          : path.join(cwd, `untitled${languages[document.languageId]}`);
+      const file = hasSourcePath
+        ? document.uri.fsPath
+        : path.join(cwd, `untitled${languages[document.languageId]}`);
       if (djangoHtml(file, source)) return [];
       const output = await this.formatter.format(
         runtime,
@@ -84,6 +84,7 @@ export class FormattingProvider
               end: document.offsetAt(range.end),
             }
           : undefined,
+        document.languageId === "jsonc" ? "jsonc" : undefined,
       );
       if (
         controller.signal.aborted ||

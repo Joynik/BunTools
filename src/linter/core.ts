@@ -1,4 +1,5 @@
 import path from "node:path";
+import { BunConfiguration, type ConfigSource } from "../configuration/bunfig";
 import { realpath } from "node:fs/promises";
 import { Runner } from "../bun/runner";
 import type { Runtime } from "../bun/discovery";
@@ -81,17 +82,37 @@ export function parseReport(text: string): LintFile[] {
 }
 
 export class Linter {
-  constructor(private readonly runner: Runner) {}
+  constructor(
+    private readonly runner: Runner,
+    readonly configuration = new BunConfiguration(runner),
+  ) {}
   async ensureNative(
     runtime: Runtime,
     cwd: string,
     files: string[],
     signal?: AbortSignal,
+    selection?: ConfigSource,
   ) {
+    const config =
+      selection ??
+      (await this.configuration.resolve(
+        runtime,
+        "lint",
+        cwd,
+        files.length === 1 && files[0] !== "." ? files[0] : undefined,
+        signal,
+      ));
     const result = await this.runner.run(
       runtime.path,
-      ["lint", "--no-script", "--doctor", "--format=json", ...files],
-      { cwd, signal },
+      [
+        ...config.prefix,
+        "lint",
+        "--no-script",
+        "--doctor",
+        "--format=json",
+        ...files,
+      ],
+      { cwd: config.cwd, signal },
     );
     if (result.code !== 0)
       throw new Error("Bun lint configuration inspection failed.");
@@ -116,13 +137,55 @@ export class Linter {
       write?: boolean;
       typeAware?: boolean;
       signal?: AbortSignal;
+      selection?: ConfigSource;
     } = {},
   ): Promise<LintFile[]> {
     if (!runtime.lint) throw new Error(runtime.lintReason);
     if (options.fix && !runtime.fixes)
       throw new Error("This Bun does not support verified dry-run fixes.");
-    await this.ensureNative(runtime, cwd, files, options.signal);
-    const args = ["lint", "--no-script", "--format=json"];
+    const config =
+      options.selection ??
+      (await this.configuration.resolve(
+        runtime,
+        "lint",
+        cwd,
+        files.length === 1 && files[0] !== "." ? files[0] : undefined,
+        options.signal,
+      ));
+    if (options.input === undefined && !options.selection) {
+      let paths = files;
+      if (files.some((file) => file === ".")) {
+        const list = await this.runner.run(
+          runtime.path,
+          [...config.prefix, "lint", "--no-script", "--list-files", ...files],
+          { cwd: config.cwd, signal: options.signal, timeout: 120000 },
+        );
+        if (list.code !== 0)
+          throw new Error("Bun could not enumerate lint files.");
+        paths = list.stdout
+          .split(/\r?\n/)
+          .filter(Boolean)
+          .map((file) => path.resolve(config.cwd, file));
+      }
+      const reports: LintFile[] = [];
+      for (const group of await this.configuration.groups(
+        runtime,
+        "lint",
+        cwd,
+        paths,
+        options.signal,
+      )) {
+        reports.push(
+          ...(await this.run(runtime, cwd, group.files, {
+            ...options,
+            selection: group.config,
+          })),
+        );
+      }
+      return reports;
+    }
+    await this.ensureNative(runtime, cwd, files, options.signal, config);
+    const args = [...config.prefix, "lint", "--no-script", "--format=json"];
     if (options.input !== undefined) {
       if (files.length !== 1)
         throw new Error("Stdin lint requires one source path.");
@@ -137,7 +200,7 @@ export class Linter {
       args.push("--type-aware");
     }
     const result = await this.runner.run(runtime.path, args, {
-      cwd,
+      cwd: config.cwd,
       input: options.input,
       signal: options.signal,
       timeout: options.input === undefined ? 120000 : 15000,

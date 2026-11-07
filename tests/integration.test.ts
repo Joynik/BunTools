@@ -180,3 +180,21 @@ test("rejects external formatter delegation without calling external engine", as
   expect(report.plugins.not_installed.length).toBeGreaterThan(0);
   expect(supportedFile("index.astro")).toBe(false);
 });
+
+test("JSONC language override preserves comments for VS Code settings.json", async () => {
+  const file = path.join(cwd, "settings.json");
+  const input = '{// editor options\n"editor.fontSize":14,\n}';
+  await writeFile(file, "{}");
+  const output = await formatter.format(
+    runtime,
+    cwd,
+    file,
+    input,
+    undefined,
+    undefined,
+    "jsonc",
+  );
+  expect(output).toContain("// editor options");
+  expect(output).toContain('"editor.fontSize": 14');
+  expect(await readFile(file, "utf8")).toBe("{}");
+});

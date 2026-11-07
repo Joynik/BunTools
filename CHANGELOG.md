@@ -1,15 +1,15 @@
 # Changelog
 
+## Unreleased
+
+## 0.2.1 — 2026-11-07
+
+- Add section-aware global Bun configuration with per-file and multi-root resolution.
+- Report selected formatter and linter configuration in Runtime Info.
+- Add automatic release versioning and Marketplace packaging metadata.
+
 ## 0.1.0 — 2026-11-07
 
-- Add the official Bun mascot with a wrench badge as the VS Code extension icon.
-
-- Discover installed Bun per workspace, including Homebrew, PATH, official installer and explicit paths.
-- Format current saved or unsaved documents through native Bun stdin and standard VS Code formatting APIs.
-- Format selected JavaScript/TypeScript statements with native Bun range flags.
-- Add cancellable workspace formatting and read-only formatting checks.
-- Add runtime capability reporting, isolated discovery probes, process limits, timeouts and restart.
-- Add native JSON lint diagnostics with debounce, cancellation, document version guards, onType/onSave/manual modes and type-aware rules.
-- Add native Quick Fix, source.fixAll.bun, dry-run fixes for unsaved buffers, opt-in fixes on save and workspace lint/fix commands.
-- Probe capabilities at runtime. Lint and fixes verified with Bun 1.4.4-canary.1+7ca0042d3; older binaries keep supported formatting features.
-- Add automated unit, real-Bun integration and VS Code host tests.
+- Native Bun formatting, diagnostics, safe fixes and workspace commands.
+- Automatic runtime discovery, cancellation and multi-root support.
+- User settings formatting, language status and extension icon.

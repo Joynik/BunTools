@@ -1,174 +1,193 @@
 {
-  "name": "bun-tools",
-  "displayName": "Bun Formatter & Linter",
-  "description": "Native Bun formatting, lint diagnostics and safe fixes through the installed Bun executable.",
-  "version": "0.1.0",
-  "publisher": "Kira",
-  "license": "MIT",
-  "engines": {
-    "vscode": "^1.96.0"
-  },
-  "categories": [
-    "Formatters",
-    "Linters"
-  ],
-  "keywords": [
-    "bun",
-    "formatter",
-    "lint"
-  ],
-  "main": "./dist/extension.js",
-  "extensionKind": [
-    "workspace"
-  ],
-  "capabilities": {
-    "untrustedWorkspaces": {
-      "supported": false,
-      "description": "Bun Tools executes an installed Bun binary and reads project configuration."
+    "name": "bun-tools",
+    "displayName": "Bun Formatter & Linter",
+    "description": "Native Bun formatting, lint diagnostics and safe fixes through the installed Bun executable.",
+    "version": "0.2.1",
+    "publisher": "kira",
+    "license": "MIT",
+    "engines": {
+        "vscode": "^1.96.0"
     },
-    "virtualWorkspaces": {
-      "supported": false
-    }
-  },
-  "activationEvents": [
-    "onLanguage:javascript",
-    "onLanguage:javascriptreact",
-    "onLanguage:typescript",
-    "onLanguage:typescriptreact",
-    "onLanguage:html",
-    "onLanguage:css",
-    "onLanguage:scss",
-    "onLanguage:less",
-    "onLanguage:vue",
-    "onLanguage:json",
-    "onLanguage:jsonc",
-    "onLanguage:json5",
-    "onLanguage:graphql",
-    "onLanguage:yaml"
-  ],
-  "contributes": {
-    "commands": [
-      {
-        "command": "bunTools.formatWorkspace",
-        "title": "Format Workspace",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.checkFormatting",
-        "title": "Check Formatting",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.lintWorkspace",
-        "title": "Lint Workspace",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.fixCurrentFile",
-        "title": "Fix Current File",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.fixWorkspace",
-        "title": "Fix Workspace",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.restart",
-        "title": "Restart",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.showRuntimeInfo",
-        "title": "Show Runtime Info",
-        "category": "Bun Tools"
-      },
-      {
-        "command": "bunTools.showOutput",
-        "title": "Show Output",
-        "category": "Bun Tools"
-      }
+    "categories": [
+        "Formatters",
+        "Linters"
     ],
-    "configuration": {
-      "title": "Bun Tools",
-      "properties": {
-        "bunTools.bunPath": {
-          "type": "string",
-          "default": "",
-          "scope": "resource",
-          "description": "Bun executable path. Empty discovers Bun automatically. Relative paths resolve against the workspace folder."
+    "keywords": [
+        "bun",
+        "formatter",
+        "lint"
+    ],
+    "main": "./dist/extension.js",
+    "extensionKind": [
+        "workspace"
+    ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": false,
+            "description": "Bun Tools executes an installed Bun binary and reads project configuration."
         },
-        "bunTools.format.enable": {
-          "type": "boolean",
-          "default": true,
-          "scope": "resource",
-          "description": "Enable native Bun document and selection formatting."
-        },
-        "bunTools.lint.enable": {
-          "type": "boolean",
-          "default": true,
-          "scope": "resource",
-          "description": "Enable native Bun lint diagnostics and Code Actions when supported by the installed Bun."
-        },
-        "bunTools.lint.run": {
-          "type": "string",
-          "enum": [
-            "onType",
-            "onSave",
-            "manual"
-          ],
-          "default": "onType",
-          "scope": "resource",
-          "description": "When to lint documents. onType includes opening, typing with debounce, and saving."
-        },
-        "bunTools.lint.debounce": {
-          "type": "integer",
-          "default": 400,
-          "minimum": 50,
-          "maximum": 10000,
-          "scope": "resource",
-          "description": "Delay after typing before linting, in milliseconds."
-        },
-        "bunTools.lint.fixOnSave": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "description": "Apply native Bun safe fixes on save. Disabled by default. Requires verified dry-run support."
-        },
-        "bunTools.lint.typeAware": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "description": "Enable native Bun type-aware lint rules. This can increase analysis time."
-        },
-        "bunTools.output.logLevel": {
-          "type": "string",
-          "enum": [
-            "error",
-            "warn",
-            "info",
-            "debug"
-          ],
-          "default": "info",
-          "description": "Output verbosity. Source contents are never logged."
+        "virtualWorkspaces": {
+            "supported": false
         }
-      }
+    },
+    "activationEvents": [
+        "onLanguage:javascript",
+        "onLanguage:javascriptreact",
+        "onLanguage:typescript",
+        "onLanguage:typescriptreact",
+        "onLanguage:html",
+        "onLanguage:css",
+        "onLanguage:scss",
+        "onLanguage:less",
+        "onLanguage:vue",
+        "onLanguage:json",
+        "onLanguage:jsonc",
+        "onLanguage:json5",
+        "onLanguage:graphql",
+        "onLanguage:yaml"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "bunTools.formatWorkspace",
+                "title": "Format Workspace",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.checkFormatting",
+                "title": "Check Formatting",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.lintWorkspace",
+                "title": "Lint Workspace",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.fixCurrentFile",
+                "title": "Fix Current File",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.fixWorkspace",
+                "title": "Fix Workspace",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.restart",
+                "title": "Restart",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.showRuntimeInfo",
+                "title": "Show Runtime Info",
+                "category": "Bun Tools"
+            },
+            {
+                "command": "bunTools.showOutput",
+                "title": "Show Output",
+                "category": "Bun Tools"
+            }
+        ],
+        "configuration": {
+            "title": "Bun Tools",
+            "properties": {
+                "bunTools.bunPath": {
+                    "type": "string",
+                    "default": "",
+                    "scope": "resource",
+                    "description": "Bun executable path. Empty discovers Bun automatically. Relative paths resolve against the workspace folder."
+                },
+                "bunTools.format.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "scope": "resource",
+                    "description": "Enable native Bun document and selection formatting."
+                },
+                "bunTools.lint.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "scope": "resource",
+                    "description": "Enable native Bun lint diagnostics and Code Actions when supported by the installed Bun."
+                },
+                "bunTools.lint.run": {
+                    "type": "string",
+                    "enum": [
+                        "onType",
+                        "onSave",
+                        "manual"
+                    ],
+                    "default": "onType",
+                    "scope": "resource",
+                    "description": "When to lint documents. onType includes opening, typing with debounce, and saving."
+                },
+                "bunTools.lint.debounce": {
+                    "type": "integer",
+                    "default": 400,
+                    "minimum": 50,
+                    "maximum": 10000,
+                    "scope": "resource",
+                    "description": "Delay after typing before linting, in milliseconds."
+                },
+                "bunTools.lint.fixOnSave": {
+                    "type": "boolean",
+                    "default": false,
+                    "scope": "resource",
+                    "description": "Apply native Bun safe fixes on save. Disabled by default. Requires verified dry-run support."
+                },
+                "bunTools.lint.typeAware": {
+                    "type": "boolean",
+                    "default": false,
+                    "scope": "resource",
+                    "description": "Enable native Bun type-aware lint rules. This can increase analysis time."
+                },
+                "bunTools.output.logLevel": {
+                    "type": "string",
+                    "enum": [
+                        "error",
+                        "warn",
+                        "info",
+                        "debug"
+                    ],
+                    "default": "info",
+                    "description": "Output verbosity. Source contents are never logged."
+                },
+                "bunTools.globalConfigPath": {
+                    "type": "string",
+                    "default": "~/.config/bun/bunfig.toml",
+                    "scope": "resource",
+                    "description": "Global Bun TOML config used per tool when no local section exists. Empty disables the global fallback."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "build": "bun build ./src/extension.ts --target=node --format=cjs --external=vscode --outfile=dist/extension.js",
+        "typecheck": "tsc --noEmit",
+        "test": "bun test tests/unit.test.ts tests/integration.test.ts tests/lint.test.ts tests/configuration.test.ts tests/release.test.ts",
+        "test:host": "bun run build && bun scripts/test-host.ts",
+        "package": "bun run build && vsce package --no-dependencies",
+        "vscode:prepublish": "bun run build",
+        "release": "bun scripts/release.ts",
+        "publish:marketplace": "vsce publish --no-dependencies"
+    },
+    "devDependencies": {
+        "@types/bun": "^1.3.0",
+        "@types/vscode": "1.96.0",
+        "@vscode/test-electron": "^2.5.2",
+        "@vscode/vsce": "^3.6.0",
+        "typescript": "^5.9.3"
+    },
+    "icon": "assets/icon.png",
+    "author": {
+        "name": "Kira"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Joynik/BunTools.git"
+    },
+    "homepage": "https://github.com/Joynik/BunTools#readme",
+    "bugs": {
+        "url": "https://github.com/Joynik/BunTools/issues"
     }
-  },
-  "scripts": {
-    "build": "bun build ./src/extension.ts --target=node --format=cjs --external=vscode --outfile=dist/extension.js",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test tests/unit.test.ts tests/integration.test.ts tests/lint.test.ts",
-    "test:host": "bun run build && bun scripts/test-host.ts",
-    "package": "bun run build && vsce package --no-dependencies --allow-missing-repository --no-rewrite-relative-links --out bun-tools-0.1.0.vsix",
-    "vscode:prepublish": "bun run build"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.3.0",
-    "@types/vscode": "1.96.0",
-    "@vscode/test-electron": "^2.5.2",
-    "@vscode/vsce": "^3.6.0",
-    "typescript": "^5.9.3"
-  },
-  "icon": "assets/icon.png"
 }

@@ -24,15 +24,20 @@ try {
     "[fmt]\nsemi = false\n",
   );
   await writeFile(path.join(folders[1], "bunfig.toml"), "[fmt]\nsemi = true\n");
+  await writeFile(
+    path.join(temp, "global.toml"),
+    '[fmt]\nsemi=false\nsingleQuote=true\ntabWidth=4\n[lint.rules]\n"no-console"="error"\n',
+  );
   const workspace = path.join(temp, "test.code-workspace");
   await writeFile(
     workspace,
     JSON.stringify({
       folders: folders.map((folder) => ({ path: folder })),
       settings: {
-        "editor.defaultFormatter": "buntools-local.bun-tools",
+        "editor.defaultFormatter": "kira.bun-tools",
         "editor.formatOnSave": true,
         "files.autoSave": "off",
+        "bunTools.globalConfigPath": path.join(temp, "global.toml"),
       },
     }),
   );
