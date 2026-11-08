@@ -377,9 +377,12 @@ export async function run() {
     );
     await dirtyDoc.save();
     await vscode.window.showTextDocument(dirtyDoc);
-    const configInfo = await vscode.commands.executeCommand<any>(
-        "bunTools.showRuntimeInfo",
-    );
+    const configInfo = await vscode.commands.executeCommand<{
+        configuration: {
+            format: { source: string };
+            lint: { source: string };
+        };
+    }>("bunTools.showRuntimeInfo");
     assert.equal(configInfo.configuration.format.source, "local");
     assert.equal(configInfo.configuration.lint.source, "global");
     check("Runtime Info reports independent local fmt and global lint sources");
@@ -429,9 +432,9 @@ export async function run() {
     await vscode.workspace.applyEdit(globalSettingsChange);
     await vscode.commands.executeCommand("editor.action.formatDocument");
     assert.ok(settingsDoc.getText().includes('\n    "globalSetting"'));
-    const settingsInfo = await vscode.commands.executeCommand<any>(
-        "bunTools.showRuntimeInfo",
-    );
+    const settingsInfo = await vscode.commands.executeCommand<
+        typeof configInfo
+    >("bunTools.showRuntimeInfo");
     assert.equal(settingsInfo.configuration.format.source, "global");
     check("User settings outside the project use the configured global file");
     console.log(`HOST RESULT: ${checks} checks passed`);

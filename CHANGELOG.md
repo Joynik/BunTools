@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.2.1 — 2026-11-07
+## 0.2.2 — 2026-11-08
 
 - Add section-aware global Bun configuration with per-file and multi-root resolution.
 - Report selected formatter and linter configuration in Runtime Info.

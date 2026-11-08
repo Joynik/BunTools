@@ -2,7 +2,7 @@
     "name": "bun-tools",
     "displayName": "Bun Formatter & Linter",
     "description": "Native Bun formatting, lint diagnostics and safe fixes through the installed Bun executable.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "publisher": "kira",
     "license": "MIT",
     "engines": {
