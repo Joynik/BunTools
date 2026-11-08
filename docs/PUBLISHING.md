@@ -1,14 +1,14 @@
 # Publishing
 
-1. In [Marketplace publisher management](https://marketplace.visualstudio.com/manage), use publisher
-   ID `kira` and display name **Kira**. Display names belong to the account, not `package.json`.
-2. Add concise notes under `## Unreleased` in `CHANGELOG.md`.
-3. Run `bun run test:host`, then `bun run release`. Use `minor` or `major` for those version
-   increments.
-4. Install and review the generated VSIX. Release updates the package version and changelog
-   automatically; ordinary builds do not.
-5. When ready, upload the VSIX in Marketplace management. Alternatively, authenticate `vsce` and
-   explicitly run `bun run publish:marketplace`.
+1. Use publisher ID `kira` and display name **Kira** in
+   [Marketplace management](https://marketplace.visualstudio.com/manage).
+2. Follow [BUILD.md](../BUILD.md), run host tests and prepare the release.
+3. Install and review the generated VSIX.
+4. Upload the VSIX in Marketplace management, or authenticate `vsce` and run
+   `bun run publish:marketplace`.
 
-No script commits, pushes, tags or publishes automatically. Keep credentials out of the repository.
-Verify publisher ownership and the public repository before the first publication.
+```text
+Prepare → Verify → Review VSIX → Publish
+```
+
+Release preparation does not commit, tag, push or publish.

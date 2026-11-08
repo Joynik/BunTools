@@ -57,4 +57,4 @@ are read from disk. Unsupported Bun capabilities are reported without fallback e
 The `{}` language status menu shows Bun status. **Show Runtime Info** includes the selected
 configuration sources.
 
-[Publishing](docs/PUBLISHING.md) · [Testing](docs/TESTING.md) · MIT License
+[Publishing](docs/PUBLISHING.md) · [Build and testing](BUILD.md) · MIT License
