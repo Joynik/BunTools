@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "BunTools",
+  "project_id": "84c552a5-296d-466b-a7cc-f50329b08788"
+}
