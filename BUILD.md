@@ -19,9 +19,9 @@ Code. Runtime verification covers macOS; Windows and Linux discovery have unit c
 ## Release
 
 `package.json` is the version source. Add notes under `## Unreleased` in `CHANGELOG.md`. Run
-`bun run release` for patch changes or `bun run release minor` for features. Use `major` only with
-explicit user authorization. Append `--dry-run` to preview the version. The command runs type checks
-and tests, increments the version, updates the changelog and builds the VSIX. Ordinary builds and
-packaging do not increment the version.
+`bun run release` for patch changes, `bun run release minor` for features, or
+`bun run release major` for incompatible changes. Append `--dry-run` to preview the version. Release
+dates use UTC. The command runs type checks and tests, increments the version, updates the changelog
+and builds the VSIX. Ordinary builds and packaging do not increment the version.
 
 [Publication](docs/PUBLISHING.md) requires an explicit action.

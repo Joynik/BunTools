@@ -18,7 +18,9 @@ the relevant CLI features. Bun is detected automatically; no extra engine is ins
 ```
 
 Formatting supports JS/JSX, TS/TSX, HTML, CSS, SCSS, Less, Vue, JSON/JSONC/JSON5, GraphQL and YAML.
-User `settings.json` is supported. Markdown, TOML and Django HTML are excluded.
+User `settings.json` is supported. Markdown and TOML are excluded. HTML containing `{{` or `{%` is
+skipped to preserve templates. Set `bunTools.output.logLevel` to `debug` and use **Show Output** to
+see why formatting was skipped.
 
 ## Configuration
 
