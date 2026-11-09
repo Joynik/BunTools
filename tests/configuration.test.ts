@@ -199,3 +199,69 @@ test("workspace lint batches nested projects by their own native configuration",
     reports.find((report) => report.filePath.endsWith("child.ts"))!.messages,
   ).toEqual([]);
 });
+
+test("TOML parsing isolates ambient preload and removes private directories on success and failure", async () => {
+  const ambient = await project("ambient-preload");
+  const marker = path.join(ambient, "preload-executed");
+  await writeFile(
+    path.join(ambient, "bunfig.toml"),
+    'preload = ["./preload.ts"]\n',
+  );
+  await writeFile(
+    path.join(ambient, "preload.ts"),
+    `await Bun.write(${JSON.stringify(marker)}, "executed");`,
+  );
+  const parser = path.resolve(
+    import.meta.dir,
+    "../src/configuration/bunfig.ts",
+  );
+  const runnerModule = path.resolve(import.meta.dir, "../src/bun/runner.ts");
+  const script = `
+    import { BunConfiguration } from ${JSON.stringify(parser)};
+    import { Runner } from ${JSON.stringify(runnerModule)};
+    import { writeFile, readdir, access } from "node:fs/promises";
+    import path from "node:path";
+    const ambient = ${JSON.stringify(ambient)};
+    const file = path.join(ambient, "input.toml");
+    const runner = new Runner();
+    try {
+      const configuration = new BunConfiguration(runner);
+      await writeFile(file, "[fmt]\\nsemi=false\\n");
+      const keys = await configuration.sections({ path: process.execPath }, file);
+      if (JSON.stringify(keys) !== '["fmt"]') throw new Error("Wrong TOML sections");
+      await writeFile(file, "[invalid");
+      try {
+        await configuration.sections({ path: process.execPath }, file);
+        throw new Error("Invalid TOML was accepted");
+      } catch (error) {
+        if (!String(error).includes("Cannot parse Bun configuration")) throw error;
+      }
+      await writeFile(file, "[lint]\\n");
+      try {
+        await configuration.sections({ path: path.join(ambient, "missing-bun") }, file);
+        throw new Error("Missing executable was accepted");
+      } catch (error) {
+        if (String(error).includes("was accepted")) throw error;
+      }
+      if ((await readdir(ambient)).some(name => name.startsWith("bun-tools-toml-")))
+        throw new Error("Private directory was not removed");
+      try {
+        await access(${JSON.stringify(marker)});
+        throw new Error("Ambient preload executed");
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
+    } finally { runner.dispose(); }
+  `;
+  const child = Bun.spawn(
+    [runtime.path, "--no-install", "--no-env-file", "-e", script],
+    {
+      cwd: root,
+      env: { ...process.env, TMPDIR: ambient, TMP: ambient, TEMP: ambient },
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  );
+  const stderr = await new Response(child.stderr).text();
+  expect({ code: await child.exited, stderr }).toEqual({ code: 0, stderr: "" });
+});

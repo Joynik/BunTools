@@ -203,7 +203,7 @@ export class Discovery {
         }
       }
       throw new Error(
-        `Bun was not found or could not run. Install Bun manually or set bunTools.bunPath.${errors.length ? `\n${errors.join("\n")}` : ""}`,
+        `Bun was not found or could not run. Install Bun manually or set bunTools.bunPath, then run Bun Tools: Restart.${errors.length ? `\n${errors.join("\n")}` : ""}`,
       );
     } finally {
       await rm(probe, { recursive: true, force: true });

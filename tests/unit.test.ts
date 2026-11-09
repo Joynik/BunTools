@@ -53,6 +53,7 @@ test("missing executable produces actionable error and cached result", async () 
   const first = discovery.get(options);
   expect(first).toBe(discovery.get(options));
   await expect(first).rejects.toThrow("bunTools.bunPath");
+  await expect(first).rejects.toThrow("Bun Tools: Restart");
   discovery.clear();
   expect(discovery.get(options)).not.toBe(first);
   await expect(discovery.get(options)).rejects.toThrow();

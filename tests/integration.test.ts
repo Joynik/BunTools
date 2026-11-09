@@ -16,7 +16,6 @@ import {
   minimalEdit,
   languages,
   supportedFile,
-  djangoHtml,
 } from "../src/formatter/core";
 
 const runner = new Runner();

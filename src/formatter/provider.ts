@@ -14,6 +14,7 @@ export class FormattingProvider
     private readonly discovery: Discovery,
     private readonly formatter: Formatter,
     private readonly error: (message: string) => void,
+    private readonly debug: (message: string) => void,
   ) {}
 
   provideDocumentFormattingEdits(
@@ -46,7 +47,12 @@ export class FormattingProvider
     if (!config.get("format.enable", true)) return [];
     const source = document.getText(),
       version = document.version;
-    if (document.languageId === "html" && /{%|{{/.test(source)) return [];
+    if (document.languageId === "html" && /{%|{{/.test(source)) {
+      this.debug(
+        `Skipped HTML with template markers: ${document.uri.toString()}`,
+      );
+      return [];
+    }
     const key = document.uri.toString();
     this.pending.get(key)?.abort();
     const controller = new AbortController();
@@ -71,7 +77,12 @@ export class FormattingProvider
       const file = hasSourcePath
         ? document.uri.fsPath
         : path.join(cwd, `untitled${languages[document.languageId]}`);
-      if (djangoHtml(file, source)) return [];
+      if (djangoHtml(file, source)) {
+        this.debug(
+          `Skipped HTML with template markers: ${document.uri.toString()}`,
+        );
+        return [];
+      }
       const output = await this.formatter.format(
         runtime,
         cwd,

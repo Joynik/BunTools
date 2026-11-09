@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import * as vscode from "vscode";
+import { Runner } from "../src/bun/runner";
+import { Discovery } from "../src/bun/discovery";
+import { Linter } from "../src/linter/core";
+import { LintService } from "../src/linter/service";
 
 export async function run() {
     const extension = vscode.extensions.getExtension("kira.bun-tools");
@@ -103,6 +107,7 @@ export async function run() {
         ["notes.md", "markdown", "#   Hello"],
         ["config.toml", "toml", "x=1"],
         ["template.html", "html", '{% extends "base.html" %}<p>{{x}}</p>'],
+        ["interpolation.html", "html", "<p>{{ value }}</p>"],
     ] as const) {
         const file = path.join(folders[0].uri.fsPath, name);
         await writeFile(file, source);
@@ -296,6 +301,41 @@ export async function run() {
         0,
     );
     check("closing a document clears Bun diagnostics");
+    const refreshRunner = new Runner();
+    const refreshLinter = new Linter(refreshRunner);
+    const refreshMessages: string[] = [];
+    const refreshService = new LintService(
+        new Discovery(refreshRunner), refreshLinter,
+        message => { throw new Error(message); },
+        message => refreshMessages.push(message),
+    );
+    try {
+        const closedFiles = folders.map(folder => vscode.Uri.file(path.join(folder.uri.fsPath, "closed-lint.ts")));
+        for (let index = 0; index < folders.length; index++) {
+            await writeFile(closedFiles[index].fsPath, "let closedValue=1; console.log(closedValue);");
+            const reports = await refreshLinter.run(runtime, folders[index].uri.fsPath, [closedFiles[index].fsPath]);
+            refreshService.publishWorkspace(reports, folders[index], new Map());
+            assert.ok(refreshService.diagnostics.get(closedFiles[index])?.length);
+        }
+        const otherVersion = refreshService.configurationVersion(folders[1]);
+        const localConfig = path.join(folders[0].uri.fsPath, "bunfig.toml");
+        const originalConfig = await readFile(localConfig, "utf8");
+        await writeFile(localConfig, originalConfig + "\n# host scoped refresh\n");
+        await until(() => !refreshService.diagnostics.get(closedFiles[0])?.length, "Local config clears closed-file diagnostics in its root");
+        assert.ok(refreshService.diagnostics.get(closedFiles[1])?.length);
+        assert.equal(refreshService.configurationVersion(folders[1]), otherVersion);
+        assert.ok(refreshMessages.some(message => message.includes("Bun Tools: Lint Workspace")));
+        check("local config refresh preserves closed-file diagnostics in the other root and explains invalidation");
+        await until(() => !!refreshService.diagnostics.get(doc.uri)?.some(item => item.code === "no-console") || !!refreshService.diagnostics.get(doc.uri), "Open documents are checked again after local config changes");
+        refreshService.refresh();
+        assert.equal(refreshService.diagnostics.get(closedFiles[1])?.length ?? 0, 0);
+        assert.notEqual(refreshService.configurationVersion(folders[1]), otherVersion);
+        check("global refresh invalidates both roots and rechecks open documents");
+        await writeFile(localConfig, originalConfig);
+    } finally {
+        refreshService.dispose();
+        refreshRunner.dispose();
+    }
     const changedFolders = new Promise<void>((resolve) => {
         const listener = vscode.workspace.onDidChangeWorkspaceFolders(() => {
             listener.dispose();

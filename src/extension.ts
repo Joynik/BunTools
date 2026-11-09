@@ -49,8 +49,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   };
   const linter = new Linter(runner, configuration);
-  const lintService = new LintService(discovery, linter, reportError);
-  const provider = new FormattingProvider(discovery, formatter, reportError);
+  const lintService = new LintService(discovery, linter, reportError, log);
+  const provider = new FormattingProvider(
+    discovery,
+    formatter,
+    reportError,
+    (message) => log(message, "debug"),
+  );
   const selector: vscode.DocumentSelector = Object.keys(languages).flatMap(
     (language) => [
       { language, scheme: "file" },
@@ -256,8 +261,10 @@ export function activate(context: vscode.ExtensionContext) {
               if (
                 /\.html?$/i.test(file) &&
                 djangoHtml(file, await readFile(file, "utf8"))
-              )
+              ) {
+                log(`Skipped HTML with template markers: ${file}`, "debug");
                 continue;
+              }
               if ((await stat(file)).isFile()) files.push(file);
             }
             const uniqueFiles = [...new Set(files)];
@@ -372,6 +379,7 @@ export function activate(context: vscode.ExtensionContext) {
               document.version,
             ]),
           );
+          const configurationVersion = lintService.configurationVersion(folder);
           try {
             if (!fix && dirtyIn(folder))
               void vscode.window.showInformationMessage(
@@ -390,9 +398,17 @@ export function activate(context: vscode.ExtensionContext) {
                   .get("lint.typeAware", false),
               },
             );
+            if (
+              lintService.configurationVersion(folder) !== configurationVersion
+            ) {
+              log(
+                "Workspace configuration changed during lint. Run Bun Tools: Lint Workspace again.",
+              );
+              return;
+            }
             lintService.clearWorkspace(folder);
             lintService.publishWorkspace(reports, folder, versions);
-            if (fix) lintService.refresh();
+            if (fix) lintService.refresh(folder);
             const count = reports.reduce(
               (sum, report) => sum + report.messages.length,
               0,

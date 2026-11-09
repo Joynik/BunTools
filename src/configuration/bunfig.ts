@@ -1,6 +1,6 @@
 import path from "node:path";
 import os from "node:os";
-import { stat, readFile } from "node:fs/promises";
+import { stat, readFile, mkdtemp, rm } from "node:fs/promises";
 import type { Runtime } from "../bun/discovery";
 import { Runner } from "../bun/runner";
 
@@ -25,7 +25,6 @@ export class BunConfiguration {
   async sections(
     runtime: Runtime,
     file: string,
-    signal?: AbortSignal,
   ): Promise<string[] | undefined> {
     let info;
     try {
@@ -39,16 +38,24 @@ export class BunConfiguration {
     let cached = this.parsed.get(key);
     if (!cached || cached.stamp !== stamp) {
       const input = await readFile(file, "utf8");
-      const result = this.runner.run(
-        runtime.path,
-        [
-          "--no-install",
-          "--no-env-file",
-          "-e",
-          "const text = await new Response(Bun.stdin.stream()).text(); console.log(JSON.stringify(Object.keys(Bun.TOML.parse(text))));",
-        ],
-        { cwd: os.tmpdir(), input, timeout: 5000 },
-      );
+      const result = (async () => {
+        // An ambient bunfig.toml can execute preload code even for --eval.
+        const cwd = await mkdtemp(path.join(os.tmpdir(), "bun-tools-toml-"));
+        try {
+          return await this.runner.run(
+            runtime.path,
+            [
+              "--no-install",
+              "--no-env-file",
+              "-e",
+              "const text = await new Response(Bun.stdin.stream()).text(); console.log(JSON.stringify(Object.keys(Bun.TOML.parse(text))));",
+            ],
+            { cwd, input, timeout: 5000 },
+          );
+        } finally {
+          await rm(cwd, { recursive: true, force: true });
+        }
+      })();
       const value = result.then((result) => {
         if (result.code !== 0)
           throw new Error(`Cannot parse Bun configuration: ${file}`);
@@ -124,7 +131,7 @@ export class BunConfiguration {
         : path.parse(directory).root;
     while (true) {
       const local = path.join(directory, "bunfig.toml");
-      if ((await this.sections(runtime, local, signal))?.includes(tool))
+      if ((await this.sections(runtime, local))?.includes(tool))
         return { source: "local", path: local, cwd: directory, prefix: [] };
       if (directory === boundary || path.dirname(directory) === directory)
         break;
@@ -132,7 +139,7 @@ export class BunConfiguration {
     }
     const global = this.globalFile(cwd, file);
     if (global) {
-      if ((await this.sections(runtime, global, signal))?.includes(tool))
+      if ((await this.sections(runtime, global))?.includes(tool))
         return {
           source: "global",
           path: global,

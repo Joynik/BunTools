@@ -34,7 +34,7 @@ if (process.argv.includes("--dry-run")) {
   await run("typecheck");
   await run("test");
   const date = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Kiev",
+    timeZone: "UTC",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

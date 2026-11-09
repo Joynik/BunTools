@@ -37,10 +37,14 @@ export class LintService implements vscode.CodeActionProvider {
   >();
   private subscriptions: vscode.Disposable[] = [];
   private nextSnapshotId = 0;
+  private refreshSerial = 0;
+  private globalVersion = 0;
+  private rootVersions = new Map<string, number>();
   constructor(
     private discovery: Discovery,
     private linter: Linter,
     private error: (message: string) => void,
+    private info: (message: string) => void,
   ) {
     this.subscriptions.push(
       vscode.workspace.onDidOpenTextDocument((document) =>
@@ -74,7 +78,8 @@ export class LintService implements vscode.CodeActionProvider {
         if (event.affectsConfiguration("bunTools")) this.refresh();
       }),
       vscode.workspace.onDidSaveTextDocument((document) => {
-        if (this.isConfig(document.uri.fsPath)) this.refresh();
+        if (this.isConfig(document.uri.fsPath))
+          this.refresh(vscode.workspace.getWorkspaceFolder(document.uri));
       }),
     );
     // Configuration is read by each Bun process. Watch known config names, not source trees.
@@ -83,9 +88,15 @@ export class LintService implements vscode.CodeActionProvider {
     );
     this.subscriptions.push(
       watcher,
-      watcher.onDidChange(() => this.refresh()),
-      watcher.onDidCreate(() => this.refresh()),
-      watcher.onDidDelete(() => this.refresh()),
+      watcher.onDidChange((uri) =>
+        this.refresh(vscode.workspace.getWorkspaceFolder(uri)),
+      ),
+      watcher.onDidCreate((uri) =>
+        this.refresh(vscode.workspace.getWorkspaceFolder(uri)),
+      ),
+      watcher.onDidDelete((uri) =>
+        this.refresh(vscode.workspace.getWorkspaceFolder(uri)),
+      ),
     );
     for (const document of vscode.workspace.textDocuments)
       this.schedule(document, "open");
@@ -397,12 +408,38 @@ export class LintService implements vscode.CodeActionProvider {
         this.diagnostics.delete(uri);
     });
   }
-  refresh() {
-    this.scheduler.dispose();
-    this.diagnostics.clear();
-    this.snapshots.clear();
-    for (const document of vscode.workspace.textDocuments)
-      this.schedule(document, "open");
+  configurationVersion(folder: vscode.WorkspaceFolder): number {
+    return this.rootVersions.get(folder.uri.toString()) ?? this.globalVersion;
+  }
+  refresh(folder?: vscode.WorkspaceFolder) {
+    const affected = (uri: vscode.Uri) =>
+      !folder ||
+      vscode.workspace.getWorkspaceFolder(uri)?.uri.toString() ===
+        folder.uri.toString();
+    if (folder)
+      this.rootVersions.set(folder.uri.toString(), ++this.refreshSerial);
+    else {
+      this.globalVersion = ++this.refreshSerial;
+      this.rootVersions.clear();
+      this.scheduler.dispose();
+    }
+    const documents = vscode.workspace.textDocuments.filter((document) =>
+      affected(document.uri),
+    );
+    const open = new Set(documents.map((document) => document.uri.toString()));
+    let closed = 0;
+    this.diagnostics.forEach((uri, diagnostics) => {
+      if (!affected(uri)) return;
+      if (diagnostics.length && !open.has(uri.toString())) closed++;
+      this.diagnostics.delete(uri);
+    });
+    for (const key of this.snapshots.keys())
+      if (affected(vscode.Uri.parse(key))) this.snapshots.delete(key);
+    for (const document of documents) this.schedule(document, "open");
+    if (closed)
+      this.info(
+        `Cleared Bun diagnostics for ${closed} closed file(s) in ${folder?.name ?? "all workspaces"}. Run Bun Tools: Lint Workspace to refresh closed files.`,
+      );
   }
   dispose() {
     this.scheduler.dispose();

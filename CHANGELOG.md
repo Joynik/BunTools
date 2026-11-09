@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.2.3 — 2026-11-09
+
+### Fixed
+
+- Limit local configuration diagnostic resets to the affected workspace root and explain closed-file
+  rechecks.
+- Explain skipped HTML templates in debug output and documentation.
+- Explain how to restart runtime discovery after installing Bun.
+
+### Security
+
+- Isolate TOML parsing from preload scripts in the temporary directory.
+
 ## 0.2.2 — 2026-11-08
 
 - Add section-aware global Bun configuration with per-file and multi-root resolution.
