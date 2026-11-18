@@ -1,3 +1,11 @@
 {
-    "$schema": "https://unpkg.com/knip@6/schema.json"
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    "entry": [
+        "src/extension.ts",
+        "tests/host.ts",
+        ".vscode-test.mjs",
+        "tests/vscode/host.test.cjs"
+    ],
+    "ignore": ["tests/fixtures/**"],
+    "ignoreBinaries": ["rumdl", "lint"]
 }
