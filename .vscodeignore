@@ -9,12 +9,11 @@
 .idea/
 
 # Mac
-.DS_Store/
+.DS_Store
 
 # ENV
 .env
 .env.*
-!.env.example
 
 # Log files
 *.log
@@ -44,6 +43,9 @@ bunfig.toml
 bun.lock
 bun.lockb
 
+# Knip configuration
+knip.json
+
 # rumdl configuration and cache
 rumdl.toml
 .rumdl_cache/**
@@ -52,21 +54,19 @@ rumdl.toml
 graphify-out/
 
 # Beads
-.beads
+.beads/
 .dolt/
 *.db
 .beads-credential-key
-.beads/proxieddb/
 *.gate.lock*
 
 # Agents settings
-.agents
-.codex
-.claude
-.pi
-.opencode
+.agents/
+.codex/
+.claude/
+.pi/
+.opencode/
 AGENTS.md
-**/AGENTS.md
 PROJECT.md
 TOOLS.md
 STANDARDS.md
@@ -86,8 +86,7 @@ tests/**
 src/**
 scripts/**
 BUILD.md
-docs/PUBLISHING.md
-docs/RESEARCH.md
+docs/**
 
 # Icon sources and debug output
 assets/*.svg
