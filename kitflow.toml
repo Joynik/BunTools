@@ -1,13 +1,14 @@
 schema = 1
 migrated_box_version = 1
-box_version = 1
+box_version = 5
 
 [selection]
 components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "agents"]
-excluded = []
+excluded = ["bunfig.toml"]
 
 [state]
 seeded_mise_keys = [["env", "JAVASCRIPT_BUILD_SCRIPT"], ["env", "PROJECT_JAVASCRIPT_DIRECTORY"], ["env", "_", "file"], ["settings", "task", "quiet"], ["settings", "task", "run_auto_install"], ["vars", "javascript_build_script"], ["vars", "javascript_directory"]]
+excluded_paths = ["bunfig.toml"]
 
 [state.artifacts.readme]
 path = "README.md"
@@ -27,28 +28,14 @@ once = true
 path = ".gitignore"
 kind = "block"
 key = ""
-sha256 = "746d6a9249b19ccb51869b1fbb2d2e95ca42150170f64a5ec6bd55cca472c74f"
-once = false
-
-[state.artifacts.env-example]
-path = ".env.example"
-kind = "file"
-key = ""
-sha256 = "970d5d48bdfc85b006d512837d74304cdbcebd4346e84233711a56f3acf6cb4e"
+sha256 = "83563d8a0ef35a7f30d9b18ef1a152e8c4121a0db471cbaaee1f81c3e943bb99"
 once = false
 
 [state.artifacts.vscodeignore]
 path = ".vscodeignore"
 kind = "block"
 key = ""
-sha256 = "586ed89c80c3cc9a3e8ae02d89430dc236c5d0c200536085ca20fbd5bb9c1bae"
-once = false
-
-[state.artifacts.bunfig]
-path = "bunfig.toml"
-kind = "file"
-key = ""
-sha256 = "2827a85e2a68f88377a06df0ae3143d1a2bdaf3400fe8bb54e1cdeba1e4ed952"
+sha256 = "fc432b253057303984a21b3954b0819a77a1adf7447921f4d8a53700f8cad76c"
 once = false
 
 [state.artifacts.knip-config]
@@ -142,11 +129,32 @@ key = "help"
 sha256 = "5a976415c57aa16ecef2ca94edfaebdb201a17d2c0a86f439a735bf7f112ecc8"
 once = false
 
-[state.artifacts."task.env:local"]
+[state.artifacts."task.verify"]
 path = "mise.toml"
 kind = "task"
-key = "env:local"
-sha256 = "bb3be6a1ff16beca762a86612a74a11adb3dd66e084c7b791cdc776c2b97a7e7"
+key = "verify"
+sha256 = "f08e1f82cadea6080381bde71846793ee4aa644d31d0ee70865646317873362b"
+once = false
+
+[state.artifacts."task.extension:prepare"]
+path = "mise.toml"
+kind = "task"
+key = "extension:prepare"
+sha256 = "f45ec69387dc7c84f2de80076ce55c9c5b03b3764e2f3bb751c7474ccea03402"
+once = false
+
+[state.artifacts."task.build"]
+path = "mise.toml"
+kind = "task"
+key = "build"
+sha256 = "46bf22d9b7bb07c1370b46249217ba58cda3aad51eae54fa61d5c8da061ef8c3"
+once = false
+
+[state.artifacts."task.typecheck"]
+path = "mise.toml"
+kind = "task"
+key = "typecheck"
+sha256 = "57177b9c9f88588825e8548cbbcbfe5f5b22078a4072173778bf84e0481e69e8"
 once = false
 
 [state.artifacts."task.check"]
@@ -154,13 +162,6 @@ path = "mise.toml"
 kind = "task"
 key = "check"
 sha256 = "e67f2ff50bd1b27dc64ff88161e89f3677a8bc64a8e2a66caae172fd1a1ce980"
-once = false
-
-[state.artifacts."task.verify"]
-path = "mise.toml"
-kind = "task"
-key = "verify"
-sha256 = "f08e1f82cadea6080381bde71846793ee4aa644d31d0ee70865646317873362b"
 once = false
 
 [state.artifacts."task.lint"]
@@ -205,25 +206,11 @@ key = "format-check"
 sha256 = "f3e43d3f4aa42b19344d9c7a59947cafddbc40ad517d8b03e81e04e6e5efcf9c"
 once = false
 
-[state.artifacts."task.extension:prepare"]
+[state.artifacts."task.package"]
 path = "mise.toml"
 kind = "task"
-key = "extension:prepare"
-sha256 = "f45ec69387dc7c84f2de80076ce55c9c5b03b3764e2f3bb751c7474ccea03402"
-once = false
-
-[state.artifacts."task.build"]
-path = "mise.toml"
-kind = "task"
-key = "build"
-sha256 = "46bf22d9b7bb07c1370b46249217ba58cda3aad51eae54fa61d5c8da061ef8c3"
-once = false
-
-[state.artifacts."task.typecheck"]
-path = "mise.toml"
-kind = "task"
-key = "typecheck"
-sha256 = "57177b9c9f88588825e8548cbbcbfe5f5b22078a4072173778bf84e0481e69e8"
+key = "package"
+sha256 = "2a6988636439fbdb0e00a2547ed60705b078b408d1a36cabaf30e24e2c114f36"
 once = false
 
 [state.artifacts."task.test"]
@@ -232,13 +219,5 @@ kind = "task"
 key = "test"
 sha256 = "515f4cb758265314de171f5e61fc00bb37b3c2b84a4813494bdcea79988f3624"
 once = false
-
-[state.artifacts."task.package"]
-path = "mise.toml"
-kind = "task"
-key = "package"
-sha256 = "2a6988636439fbdb0e00a2547ed60705b078b408d1a36cabaf30e24e2c114f36"
-once = false
-
 [source]
 kind = "user-box"
