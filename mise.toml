@@ -6,20 +6,10 @@ task.quiet = true
 _.file = ".env"
 PROJECT_JAVASCRIPT_DIRECTORY = "{{ env.PROJECT_JAVASCRIPT_DIRECTORY | default(value=config_root ~ '/' ~ vars.javascript_directory) }}"
 JAVASCRIPT_BUILD_SCRIPT = "{{ env.JAVASCRIPT_BUILD_SCRIPT | default(value=vars.javascript_build_script) }}"
-I18N_SOURCE_LANGUAGE = "{{ env.I18N_SOURCE_LANGUAGE | default(value=vars.i18n_source_language) }}"
-I18N_LANGUAGES = "{{ env.I18N_LANGUAGES | default(value=vars.i18n_languages) }}"
-I18N_DIRECTORY = "{{ env.I18N_DIRECTORY | default(value=vars.i18n_directory) }}"
-I18N_BABEL_CONFIG = "{{ env.I18N_BABEL_CONFIG | default(value=vars.i18n_babel_config) }}"
-I18N_SCRIPT = "{{ env.I18N_SCRIPT | default(value=vars.i18n_script) }}"
 
 [vars]
 javascript_directory = "."
 javascript_build_script = "build"
-i18n_source_language = "en"
-i18n_languages = ""
-i18n_directory = "locale"
-i18n_babel_config = "babel.cfg"
-i18n_script = "translations"
 
 
 # kitflow:begin task.help
@@ -94,6 +84,48 @@ bun lint --no-script --format unix --max-warnings 0 .
 )
 '''
 # kitflow:end task.lint
+
+# kitflow:begin task.check-unused
+[tasks."check-unused"]
+description = "Find potentially unused code and files"
+run = '''
+set -eu
+(
+cd "${PROJECT_JAVASCRIPT_DIRECTORY:?Set PROJECT_JAVASCRIPT_DIRECTORY in mise.toml}"
+if [ ! -x node_modules/.bin/knip ]; then
+  printf '%s\n' 'Knip is missing. Install the project dependencies first.' >&2
+  exit 1
+fi
+if command -v bun >/dev/null 2>&1; then
+  set -- bun node_modules/.bin/knip
+else
+  set -- node_modules/.bin/knip
+fi
+"$@" --include files,exports,types --reporter compact --no-progress
+)
+'''
+# kitflow:end task.check-unused
+
+# kitflow:begin task.check-deps
+[tasks."check-deps"]
+description = "Check declared dependencies"
+run = '''
+set -eu
+(
+cd "${PROJECT_JAVASCRIPT_DIRECTORY:?Set PROJECT_JAVASCRIPT_DIRECTORY in mise.toml}"
+if [ ! -x node_modules/.bin/knip ]; then
+  printf '%s\n' 'Knip is missing. Install the project dependencies first.' >&2
+  exit 1
+fi
+if command -v bun >/dev/null 2>&1; then
+  set -- bun node_modules/.bin/knip
+else
+  set -- node_modules/.bin/knip
+fi
+"$@" --dependencies --reporter compact --no-progress
+)
+'''
+# kitflow:end task.check-deps
 
 # kitflow:begin task.lint-fix
 [tasks."lint-fix"]
@@ -183,15 +215,3 @@ set -eu
 mise run extension:prepare && npm exec --no -- vsce package
 '''
 # kitflow:end task.package
-
-# kitflow:begin task.translations
-[tasks."translations"]
-description = "Update and compile selected translations"
-run = '''
-set -eu
-(
-cd "${PROJECT_JAVASCRIPT_DIRECTORY:?Set PROJECT_JAVASCRIPT_DIRECTORY in mise.toml}"
-bun run "${I18N_SCRIPT:-translations}"
-)
-'''
-# kitflow:end task.translations

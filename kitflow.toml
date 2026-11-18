@@ -1,8 +1,13 @@
 schema = 1
+migrated_box_version = 1
+box_version = 1
 
 [selection]
-components = ["javascript", "typescript", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "script-i18n", "agents"]
+components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "agents"]
 excluded = []
+
+[state]
+seeded_mise_keys = [["env", "JAVASCRIPT_BUILD_SCRIPT"], ["env", "PROJECT_JAVASCRIPT_DIRECTORY"], ["env", "_", "file"], ["settings", "task", "quiet"], ["settings", "task", "run_auto_install"], ["vars", "javascript_build_script"], ["vars", "javascript_directory"]]
 
 [state.artifacts.readme]
 path = "README.md"
@@ -46,11 +51,18 @@ key = ""
 sha256 = "2827a85e2a68f88377a06df0ae3143d1a2bdaf3400fe8bb54e1cdeba1e4ed952"
 once = false
 
+[state.artifacts.knip-config]
+path = "knip.json"
+kind = "file"
+key = ""
+sha256 = "38fba668fd656a3ae5d3ce337253dc4e09310ee7ed559ef4a805b1aed12c675f"
+once = true
+
 [state.artifacts.vscode-extension-manifest]
 path = "package.json"
 kind = "file"
 key = ""
-sha256 = "3ea317525124fc0fd77bb49907869f1bf3cd03f8b12bb442efe88631aef3b101"
+sha256 = "dc78535352af1fdbdebdcf832ea7540c46cc199b36b39351df2878ebb3f948d3"
 once = true
 
 [state.artifacts.vscode-extension-launch]
@@ -72,13 +84,6 @@ path = ".vscode-test.mjs"
 kind = "file"
 key = ""
 sha256 = "bac5a23feb0017638f6e6f1642f383287ef282cfa8074232980c73489042c12e"
-once = true
-
-[state.artifacts.vscode-extension-test]
-path = "tests/vscode/extension.test.cjs"
-kind = "file"
-key = ""
-sha256 = "60ee90224e41cea72c4292bb9b1a8ceb7b5315f37f6bf56f7b84b7190a3052a9"
 once = true
 
 [state.artifacts.rumdl]
@@ -130,13 +135,6 @@ key = ""
 sha256 = "2838618a01a64ffa6c535e9b43813cf9d582fd860de0478308595c363d5afd56"
 once = true
 
-[state.artifacts."defaults.translations"]
-path = "mise.toml"
-kind = "defaults"
-key = ""
-sha256 = "44673dc7b8972656721c5202a492a20e364ac5511d7a6847442f4722672956cb"
-once = true
-
 [state.artifacts."task.help"]
 path = "mise.toml"
 kind = "task"
@@ -170,6 +168,20 @@ path = "mise.toml"
 kind = "task"
 key = "lint"
 sha256 = "60db2df041d9119c00a2923a983c62fc5714b1cfac8413e6624b3e731a6eeed3"
+once = false
+
+[state.artifacts."task.check-unused"]
+path = "mise.toml"
+kind = "task"
+key = "check-unused"
+sha256 = "fe9c342f8ad78b2588241f13aa4684e4ff1ed1e155bfa81891213340a217dfce"
+once = false
+
+[state.artifacts."task.check-deps"]
+path = "mise.toml"
+kind = "task"
+key = "check-deps"
+sha256 = "b9c9832c15bbbf35edd6bd52c948dd9897cce4ac1e3749742bbb8203af8a1d20"
 once = false
 
 [state.artifacts."task.lint-fix"]
@@ -226,13 +238,6 @@ path = "mise.toml"
 kind = "task"
 key = "package"
 sha256 = "2a6988636439fbdb0e00a2547ed60705b078b408d1a36cabaf30e24e2c114f36"
-once = false
-
-[state.artifacts."task.translations"]
-path = "mise.toml"
-kind = "task"
-key = "translations"
-sha256 = "d0ec510360b178a387a74c57c6dda876a9238b0c103c9e45c5b08cfa7808fc23"
 once = false
 
 [source]
