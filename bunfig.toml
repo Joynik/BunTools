@@ -12,6 +12,7 @@ trailingComma = "all"
 endOfLine = "lf"
 
 ignorePatterns = [
+  "tests/fixtures/**",
   "**/*.md",
   "**/*.mdx",
   "**/*.toml",
@@ -30,6 +31,7 @@ typeAware = false
 typeCheck = false
 
 ignorePatterns = [
+  "tests/fixtures/**",
   "dist/**",
   "build/**",
   "coverage/**",
@@ -51,3 +53,16 @@ perf = "warn"
 "no-console" = "off"
 "eqeqeq" = "error"
 "curly" = "error"
+
+# Native discovery, workspace edits and cancellation require ordered operations.
+"no-await-in-loop" = "off"
+# Keep VS Code lifecycle helpers beside the state and actions they support.
+"unicorn/consistent-function-scoping" = "off"
+# TypeScript return types already permit explicit undefined results.
+"consistent-return" = "off"
+# Notification callbacks intentionally return no value.
+"promise/always-return" = "off"
+
+[test]
+# These tests run inside VS Code through .vscode-test.mjs, not in Bun.
+pathIgnorePatterns = ["tests/vscode/**"]
