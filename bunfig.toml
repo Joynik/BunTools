@@ -1,0 +1,53 @@
+[fmt]
+sortImports = true
+sortPackageJson = true
+printWidth = 100
+tabWidth = 4
+useTabs = false
+singleQuote = false
+jsxSingleQuote = false
+semi = true
+bracketSpacing = true
+trailingComma = "all"
+endOfLine = "lf"
+
+ignorePatterns = [
+  "**/*.md",
+  "**/*.mdx",
+  "**/*.toml",
+  "**/dist/**",
+  "**/build/**",
+  "**/coverage/**",
+  "**/templates/**",
+  "dist/",
+  "target/",
+  "src-tauri/target/",
+  "src-tauri/gen/",
+]
+
+[lint]
+typeAware = false
+typeCheck = false
+
+ignorePatterns = [
+  "dist/**",
+  "build/**",
+  "coverage/**",
+  "**/*.min.js",
+  "dist/",
+  "target/",
+  "src-tauri/target/",
+  "src-tauri/gen/",
+]
+
+[lint.categories]
+correctness = "error"
+suspicious = "warn"
+perf = "warn"
+
+[lint.rules]
+"no-unused-vars" = "warn"
+"no-debugger" = "error"
+"no-console" = "off"
+"eqeqeq" = "error"
+"curly" = "error"
