@@ -1,0 +1,239 @@
+schema = 1
+
+[selection]
+components = ["javascript", "typescript", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "script-i18n", "agents"]
+excluded = []
+
+[state.artifacts.readme]
+path = "README.md"
+kind = "file"
+key = ""
+sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+once = true
+
+[state.artifacts.project]
+path = "PROJECT.md"
+kind = "file"
+key = ""
+sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+once = true
+
+[state.artifacts.gitignore]
+path = ".gitignore"
+kind = "block"
+key = ""
+sha256 = "746d6a9249b19ccb51869b1fbb2d2e95ca42150170f64a5ec6bd55cca472c74f"
+once = false
+
+[state.artifacts.env-example]
+path = ".env.example"
+kind = "file"
+key = ""
+sha256 = "970d5d48bdfc85b006d512837d74304cdbcebd4346e84233711a56f3acf6cb4e"
+once = false
+
+[state.artifacts.vscodeignore]
+path = ".vscodeignore"
+kind = "block"
+key = ""
+sha256 = "586ed89c80c3cc9a3e8ae02d89430dc236c5d0c200536085ca20fbd5bb9c1bae"
+once = false
+
+[state.artifacts.bunfig]
+path = "bunfig.toml"
+kind = "file"
+key = ""
+sha256 = "2827a85e2a68f88377a06df0ae3143d1a2bdaf3400fe8bb54e1cdeba1e4ed952"
+once = false
+
+[state.artifacts.vscode-extension-manifest]
+path = "package.json"
+kind = "file"
+key = ""
+sha256 = "3ea317525124fc0fd77bb49907869f1bf3cd03f8b12bb442efe88631aef3b101"
+once = true
+
+[state.artifacts.vscode-extension-launch]
+path = ".vscode/launch.json"
+kind = "file"
+key = ""
+sha256 = "9db88f3520f33cabf4777cb4cb90b9688b2cb918ec0892233c83b6c6810f9836"
+once = true
+
+[state.artifacts.vscode-extension-editor-tasks]
+path = ".vscode/tasks.json"
+kind = "file"
+key = ""
+sha256 = "10bca47d5092b3468de57fa1dbcf140da8fd53ad949dbc7fd7431d52cceaaf5b"
+once = true
+
+[state.artifacts.vscode-extension-test-config]
+path = ".vscode-test.mjs"
+kind = "file"
+key = ""
+sha256 = "bac5a23feb0017638f6e6f1642f383287ef282cfa8074232980c73489042c12e"
+once = true
+
+[state.artifacts.vscode-extension-test]
+path = "tests/vscode/extension.test.cjs"
+kind = "file"
+key = ""
+sha256 = "60ee90224e41cea72c4292bb9b1a8ceb7b5315f37f6bf56f7b84b7190a3052a9"
+once = true
+
+[state.artifacts.rumdl]
+path = "rumdl.toml"
+kind = "file"
+key = ""
+sha256 = "888f8bdfdf27050d9bfe2a47051708241b890406eda949eebdbda64b9c193c33"
+once = false
+
+[state.artifacts.agents]
+path = "AGENTS.md"
+kind = "file"
+key = ""
+sha256 = "e9308b50035fe9733fe3d5a63c2cfac5df1ffb38731a4e18d3a90cbbfc41a87b"
+once = false
+
+[state.artifacts.standards]
+path = "STANDARDS.md"
+kind = "file"
+key = ""
+sha256 = "516e6629f5a21a169440c91237549074806e32e1de98eeba7ff53b8bb5b47bb8"
+once = false
+
+[state.artifacts.tools]
+path = "TOOLS.md"
+kind = "file"
+key = ""
+sha256 = "9d0a5634d47d8259f50e1c6194b0747cc7f144fd7bd22ba13ee1f369d5bfc2e2"
+once = false
+
+[state.artifacts."defaults.base"]
+path = "mise.toml"
+kind = "defaults"
+key = ""
+sha256 = "e946f35079fa51475f0281e8a576732db2082e566d23ea941198e865345f19e1"
+once = true
+
+[state.artifacts."defaults.javascript"]
+path = "mise.toml"
+kind = "defaults"
+key = ""
+sha256 = "5d8f33968c725d1c6d87a48f35bd5080f6672be1f5cc3b3b61bc1f0474e759ba"
+once = true
+
+[state.artifacts."defaults.javascript-build"]
+path = "mise.toml"
+kind = "defaults"
+key = ""
+sha256 = "2838618a01a64ffa6c535e9b43813cf9d582fd860de0478308595c363d5afd56"
+once = true
+
+[state.artifacts."defaults.translations"]
+path = "mise.toml"
+kind = "defaults"
+key = ""
+sha256 = "44673dc7b8972656721c5202a492a20e364ac5511d7a6847442f4722672956cb"
+once = true
+
+[state.artifacts."task.help"]
+path = "mise.toml"
+kind = "task"
+key = "help"
+sha256 = "5a976415c57aa16ecef2ca94edfaebdb201a17d2c0a86f439a735bf7f112ecc8"
+once = false
+
+[state.artifacts."task.env:local"]
+path = "mise.toml"
+kind = "task"
+key = "env:local"
+sha256 = "bb3be6a1ff16beca762a86612a74a11adb3dd66e084c7b791cdc776c2b97a7e7"
+once = false
+
+[state.artifacts."task.check"]
+path = "mise.toml"
+kind = "task"
+key = "check"
+sha256 = "e67f2ff50bd1b27dc64ff88161e89f3677a8bc64a8e2a66caae172fd1a1ce980"
+once = false
+
+[state.artifacts."task.verify"]
+path = "mise.toml"
+kind = "task"
+key = "verify"
+sha256 = "f08e1f82cadea6080381bde71846793ee4aa644d31d0ee70865646317873362b"
+once = false
+
+[state.artifacts."task.lint"]
+path = "mise.toml"
+kind = "task"
+key = "lint"
+sha256 = "60db2df041d9119c00a2923a983c62fc5714b1cfac8413e6624b3e731a6eeed3"
+once = false
+
+[state.artifacts."task.lint-fix"]
+path = "mise.toml"
+kind = "task"
+key = "lint-fix"
+sha256 = "6545cd073dd5b5a272ac5378ed35e5078ee7f596af05d3f13a8bbee900d52292"
+once = false
+
+[state.artifacts."task.format"]
+path = "mise.toml"
+kind = "task"
+key = "format"
+sha256 = "c7c35d93325a8a2b228afd0f09424cf12ba99b8a178e2ce19151c837d84c8e73"
+once = false
+
+[state.artifacts."task.format-check"]
+path = "mise.toml"
+kind = "task"
+key = "format-check"
+sha256 = "f3e43d3f4aa42b19344d9c7a59947cafddbc40ad517d8b03e81e04e6e5efcf9c"
+once = false
+
+[state.artifacts."task.extension:prepare"]
+path = "mise.toml"
+kind = "task"
+key = "extension:prepare"
+sha256 = "f45ec69387dc7c84f2de80076ce55c9c5b03b3764e2f3bb751c7474ccea03402"
+once = false
+
+[state.artifacts."task.build"]
+path = "mise.toml"
+kind = "task"
+key = "build"
+sha256 = "46bf22d9b7bb07c1370b46249217ba58cda3aad51eae54fa61d5c8da061ef8c3"
+once = false
+
+[state.artifacts."task.typecheck"]
+path = "mise.toml"
+kind = "task"
+key = "typecheck"
+sha256 = "57177b9c9f88588825e8548cbbcbfe5f5b22078a4072173778bf84e0481e69e8"
+once = false
+
+[state.artifacts."task.test"]
+path = "mise.toml"
+kind = "task"
+key = "test"
+sha256 = "515f4cb758265314de171f5e61fc00bb37b3c2b84a4813494bdcea79988f3624"
+once = false
+
+[state.artifacts."task.package"]
+path = "mise.toml"
+kind = "task"
+key = "package"
+sha256 = "2a6988636439fbdb0e00a2547ed60705b078b408d1a36cabaf30e24e2c114f36"
+once = false
+
+[state.artifacts."task.translations"]
+path = "mise.toml"
+kind = "task"
+key = "translations"
+sha256 = "d0ec510360b178a387a74c57c6dda876a9238b0c103c9e45c5b08cfa7808fc23"
+once = false
+
+[source]
+kind = "user-box"
