@@ -1,6 +1,6 @@
 schema = 1
 migrated_box_version = 1
-box_version = 6
+box_version = 7
 
 [selection]
 components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "env-example", "agents"]
@@ -224,7 +224,7 @@ once = false
 path = ".env.example"
 kind = "file"
 key = ""
-sha256 = "5a1675bf83a2ca26c645cebf2b98649104da048ea81abac887db5c8d473fabbe"
+sha256 = "3d932ab5ad1abc2a50cea5957791e4617e9a26a546bfff794382a60730f2b195"
 once = false
 
 [state.artifacts."task.env:local"]
