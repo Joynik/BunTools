@@ -1,9 +1,9 @@
 schema = 1
 migrated_box_version = 1
-box_version = 5
+box_version = 6
 
 [selection]
-components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "agents"]
+components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "env-example", "agents"]
 excluded = ["bunfig.toml"]
 
 [state]
@@ -218,6 +218,20 @@ path = "mise.toml"
 kind = "task"
 key = "test"
 sha256 = "515f4cb758265314de171f5e61fc00bb37b3c2b84a4813494bdcea79988f3624"
+once = false
+
+[state.artifacts.env-example]
+path = ".env.example"
+kind = "file"
+key = ""
+sha256 = "5a1675bf83a2ca26c645cebf2b98649104da048ea81abac887db5c8d473fabbe"
+once = false
+
+[state.artifacts."task.env:local"]
+path = "mise.toml"
+kind = "task"
+key = "env:local"
+sha256 = "bb3be6a1ff16beca762a86612a74a11adb3dd66e084c7b791cdc776c2b97a7e7"
 once = false
 [source]
 kind = "user-box"
