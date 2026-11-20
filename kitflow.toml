@@ -1,6 +1,6 @@
 schema = 1
 migrated_box_version = 1
-box_version = 8
+box_version = 9
 
 [selection]
 components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "env-example", "agents"]
