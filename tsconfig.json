@@ -7,7 +7,7 @@
         "noEmit": true,
         "esModuleInterop": true,
         "types": ["bun", "vscode"],
-        "skipLibCheck": true
+        "skipLibCheck": true,
     },
-    "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"]
+    "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
 }

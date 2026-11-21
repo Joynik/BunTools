@@ -26,6 +26,10 @@ ignorePatterns = [
   "src-tauri/gen/",
 ]
 
+[[fmt.overrides]]
+files = ["tsconfig.json", "tsconfig.*.json", "tsconfig-*.json"]
+options = { parser = "jsonc" }
+
 [lint]
 typeAware = false
 typeCheck = false
