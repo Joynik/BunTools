@@ -1,14 +1,14 @@
 schema = 1
 migrated_box_version = 1
-box_version = 9
+box_version = 11
 
 [selection]
 components = ["javascript", "typescript", "knip", "bun", "vscode-extension-bun", "vscode-extension-vsix", "rumdl", "vscode-extension", "vscode-extension-tests", "bun-tests", "env-example", "agents"]
-excluded = []
+excluded = ["bunfig.toml"]
 
 [state]
 seeded_mise_keys = [["env", "JAVASCRIPT_BUILD_SCRIPT"], ["env", "PROJECT_JAVASCRIPT_DIRECTORY"], ["env", "_", "file"], ["settings", "task", "quiet"], ["settings", "task", "run_auto_install"], ["vars", "javascript_build_script"], ["vars", "javascript_directory"]]
-excluded_paths = []
+excluded_paths = ["bunfig.toml"]
 
 [state.artifacts.readme]
 path = "README.md"
@@ -234,11 +234,5 @@ key = "env:local"
 sha256 = "bb3be6a1ff16beca762a86612a74a11adb3dd66e084c7b791cdc776c2b97a7e7"
 once = false
 
-[state.artifacts.bunfig]
-path = "bunfig.toml"
-kind = "file"
-key = ""
-sha256 = "d4f78d696efdc9be5083b7aa6091e7333118070ac494902e1663d7ffccc9dc16"
-once = false
 [source]
 kind = "user-box"
